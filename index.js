@@ -23,16 +23,26 @@ let persons = [
         name: "Mary Poppendieck",
         number: "39-23-6423122",
     },
-]
-
-app.get('/api/persons', (req, rsp) => {
-    rsp.json(persons);
-});
+];
 
 app.get('/info', (req, rsp) => {
     rsp.send(
         `<p>Phonebook has info for ${persons.length} people</p>` +
         `<p>${new Date()}</p>`)
+});
+
+app.get('/api/persons', (req, rsp) => {
+    rsp.json(persons);
+});
+
+app.get('/api/persons/:id', (req, rsp) => {
+    const id = Number(req.params.id);
+    const person = persons.find(p => p.id === id);
+    if (person) {
+        rsp.json(person);
+    } else {
+        rsp.status(404).end();
+    }
 });
 
 const PORT = 3001;
