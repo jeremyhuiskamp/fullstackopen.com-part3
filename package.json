@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "./scripts/build_ui.sh",
+    "deploy": "git push heroku",
+    "deploy:full": "./scripts/deploy_full.sh"
   },
   "author": "",
   "license": "ISC",
