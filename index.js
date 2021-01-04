@@ -59,10 +59,13 @@ app.delete('/api/persons/:id', (req, rsp) => {
 app.post('/api/persons', (req, rsp) => {
     const body = req.body;
     if (typeof body.name !== 'string' || body.name.length === 0) {
-        return rsp.status(400).send('missing name');
+        return rsp.status(400).json({ error: 'missing name' });
     }
     if (typeof body.number !== 'string' || body.number.length === 0) {
-        return rsp.status(400).send('missing number');
+        return rsp.status(400).json({ error: 'missing number' });
+    }
+    if (persons.some(p => p.name === body.name)) {
+        return rsp.status(400).json({ error: 'name must be unique' });
     }
 
     const person = {
