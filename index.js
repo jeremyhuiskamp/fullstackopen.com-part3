@@ -56,6 +56,24 @@ app.delete('/api/persons/:id', (req, rsp) => {
     }
 });
 
+app.post('/api/persons', (req, rsp) => {
+    const body = req.body;
+    if (typeof body.name !== 'string' || body.name.length === 0) {
+        return rsp.status(400).send('missing name');
+    }
+    if (typeof body.number !== 'string' || body.number.length === 0) {
+        return rsp.status(400).send('missing number');
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: Math.floor(Math.random() * 9999999999),
+    }
+    persons.push(person);
+    rsp.json(person);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
