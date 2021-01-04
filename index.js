@@ -7,6 +7,8 @@ morgan.token('post-body', req =>
     req.method === "POST" ? JSON.stringify(req.body) : null);
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'));
 
+app.use(require('cors')());
+
 let persons = [
     {
         id: 1,
@@ -80,6 +82,39 @@ app.post('/api/persons', (req, rsp) => {
     }
     persons.push(person);
     rsp.json(person);
+});
+
+app.patch('/api/persons/:id', (req, rsp) => {
+    const id = Number(req.params.id);
+    const person = persons.find(p => p.id === id);
+    if (!person) {
+        return rsp.status(404).json({ error: 'unknown person' });
+    }
+
+    const newName = req.body.name;
+    if (typeof newName === 'string') {
+        if (newName.length === 0) {
+            return rsp.status(400).json({ error: 'cannot make name empty' });
+        }
+        if (persons.some(p => p.name === newName && p.id !== id)) {
+            return rsp.status(400).json({ error: 'name must be unique' });
+        }
+    }
+
+    const newNumber = req.body.number;
+    if (typeof newNumber === 'string') {
+        if (newNumber.length === 0) {
+            return rsp.status(400).json({ error: 'cannot make number empty' });
+        }
+    }
+
+    if (typeof newName === 'string') {
+        person.name = newName;
+    }
+    if (typeof newNumber === 'string') {
+        person.number = newNumber;
+    }
+    return rsp.json(person);
 });
 
 const PORT = 3001;
