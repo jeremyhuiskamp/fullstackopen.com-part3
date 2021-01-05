@@ -5,11 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
+    "start": "node --version && node index.js",
     "dev": "nodemon index.js",
     "build:ui": "./scripts/build_ui.sh",
     "deploy": "git push heroku",
     "deploy:full": "./scripts/deploy_full.sh"
+  },
+  "engines": {
+    "node": "15.x"
   },
   "author": "",
   "license": "ISC",
