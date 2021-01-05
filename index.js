@@ -55,49 +55,36 @@ app.post('/api/persons', (req, rsp, next) => {
     if (typeof body.number !== 'string' || body.number.length === 0) {
         return rsp.status(400).json({ error: 'missing number' });
     }
-    // TODO: check for unique name...
-    // return rsp.status(400).json({ error: 'name must be unique' });
 
-    new Person({
+    Promise.resolve({
         name: body.name,
         number: body.number,
-    }).save().then(person => {
+    }).then(data =>
+        new Person(data).save()
+    ).then(person => {
         rsp.json(person);
     }).catch(next);
 });
 
 app.patch('/api/persons/:id', (req, rsp, next) => {
-    const newName = req.body.name;
-    if (typeof newName === 'string') {
-        if (newName.length === 0) {
-            return rsp.status(400).json({ error: 'cannot make name empty' });
-        }
-    }
-
-    const newNumber = req.body.number;
-    if (typeof newNumber === 'string') {
-        if (newNumber.length === 0) {
-            return rsp.status(400).json({ error: 'cannot make number empty' });
-        }
-    }
-
+    // NB: we should be able to do this in a single-round trip
+    // with an update operation.  But then we'd need to explicitly
+    // enable validation and make sure we get the full
+    // updated person back...
     Person.findById(req.params.id).then(person => {
         if (!person) {
             return rsp.status(404).json({ error: 'unknown person' });
         }
-        if (typeof newName === 'string') {
-            person.name = newName;
+        if (typeof req.body.name === 'string') {
+            person.name = req.body.name;
         }
-        if (typeof newNumber === 'string') {
-            person.number = newNumber;
+        if (typeof req.body.number === 'string') {
+            person.number = req.body.number;
         }
         return person.save().then(person => {
             rsp.json(person);
         });
     }).catch(next);
-
-    // TODO: check for unique name...
-    // return rsp.status(400).json({ error: 'name must be unique' });
 });
 
 app.use((error, req, rsp, next) => {
