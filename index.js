@@ -101,11 +101,13 @@ app.patch('/api/persons/:id', (req, rsp, next) => {
 });
 
 app.use((error, req, rsp, next) => {
-    console.error(error.message ?? error);
+    console.error(`${error.name ?? "??"}: ${error.message ?? error}`);
     if (error.name === 'CastError') {
         return rsp.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return rsp.status(400).send({ error: error.message })
     }
-    return rsp.status(500).send({ error: error.message ?? error });
+    return rsp.status(500).send({ error: "something went wrong" });
 });
 
 const PORT = process.env.PORT || 3001;
