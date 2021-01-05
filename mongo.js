@@ -1,9 +1,10 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 
 // no passwords in the shell history, thank-you...
-const url = process.env.MONGO_URL;
+const url = process.env.MONGODB_URI;
 if (!url) {
-    console.log('Please set $MONGO_URL');
+    console.log('Please set $MONGODB_URI');
     process.exit(1);
 }
 
