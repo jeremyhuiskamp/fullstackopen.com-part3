@@ -14,8 +14,6 @@ morgan.token('post-body', req =>
     req.method === "POST" ? JSON.stringify(req.body) : null);
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'));
 
-app.use(require('cors')());
-
 // serve the static FE (assuming a react build has been placed here:)
 app.use(express.static('uibuild'));
 
