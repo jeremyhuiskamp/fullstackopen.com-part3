@@ -9,7 +9,8 @@
     "dev": "nodemon index.js",
     "build:ui": "./scripts/build_ui.sh",
     "deploy": "git push heroku",
-    "deploy:full": "./scripts/deploy_full.sh"
+    "deploy:full": "./scripts/deploy_full.sh",
+    "lint": "eslint ."
   },
   "engines": {
     "node": "15.x"
@@ -17,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^7.17.0",
     "nodemon": "^2.0.6"
   },
   "dependencies": {

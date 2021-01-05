@@ -11,7 +11,7 @@ app.use(express.json());
 // request logging:
 const morgan = require('morgan');
 morgan.token('post-body', req =>
-    req.method === "POST" ? JSON.stringify(req.body) : null);
+    req.method === 'POST' ? JSON.stringify(req.body) : null);
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'));
 
 // serve the static FE (assuming a react build has been placed here:)
@@ -21,7 +21,7 @@ app.get('/info', (req, rsp, next) => {
     Person.countDocuments({}).then(count => {
         rsp.send(
             `<p>Phonebook has info for ${count} people</p>` +
-            `<p>${new Date()}</p>`)
+            `<p>${new Date()}</p>`);
     }).catch(next);
 });
 
@@ -87,14 +87,14 @@ app.patch('/api/persons/:id', (req, rsp, next) => {
     }).catch(next);
 });
 
-app.use((error, req, rsp, next) => {
-    console.error(`${error.name ?? "??"}: ${error.message ?? error}`);
+app.use((error, req, rsp, _next) => {
+    console.error(`${error.name ?? '??'}: ${error.message ?? error}`);
     if (error.name === 'CastError') {
-        return rsp.status(400).send({ error: 'malformatted id' })
+        return rsp.status(400).send({ error: 'malformatted id' });
     } else if (error.name === 'ValidationError') {
-        return rsp.status(400).send({ error: error.message })
+        return rsp.status(400).send({ error: error.message });
     }
-    return rsp.status(500).send({ error: "something went wrong" });
+    return rsp.status(500).send({ error: 'something went wrong' });
 });
 
 const PORT = process.env.PORT || 3001;
