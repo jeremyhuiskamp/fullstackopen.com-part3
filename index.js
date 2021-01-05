@@ -17,46 +17,37 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 // serve the static FE (assuming a react build has been placed here:)
 app.use(express.static('uibuild'));
 
-function handleError(rsp) {
-    // TODO: handle invalid ids and return 404
-    // Eg: Cast to ObjectId failed for value "invalid" at path "_id" for model "Person"
-    return (e) => {
-        console.log(e);
-        rsp.status(500).json({ error: e.message });
-    };
-}
-
-app.get('/info', (req, rsp) => {
+app.get('/info', (req, rsp, next) => {
     Person.countDocuments({}).then(count => {
         rsp.send(
             `<p>Phonebook has info for ${count} people</p>` +
             `<p>${new Date()}</p>`)
-    }).catch(handleError(rsp));
+    }).catch(next);
 });
 
-app.get('/api/persons', (req, rsp) => {
+app.get('/api/persons', (req, rsp, next) => {
     Person.find({}).then(persons => {
         rsp.json(persons);
-    }).catch(handleError(rsp));
+    }).catch(next);
 });
 
-app.get('/api/persons/:id', (req, rsp) => {
+app.get('/api/persons/:id', (req, rsp, next) => {
     Person.findById(req.params.id).then(person => {
         if (person) {
             rsp.json(person);
         } else {
             rsp.status(404).end();
         }
-    }).catch(handleError(rsp));
+    }).catch(next);
 });
 
-app.delete('/api/persons/:id', (req, rsp) => {
+app.delete('/api/persons/:id', (req, rsp, next) => {
     Person.findByIdAndDelete(req.params.id).then(person => {
         rsp.status(person ? 204 : 404).end();
-    }).catch(handleError(rsp));
+    }).catch(next);
 });
 
-app.post('/api/persons', (req, rsp) => {
+app.post('/api/persons', (req, rsp, next) => {
     const body = req.body;
     if (typeof body.name !== 'string' || body.name.length === 0) {
         return rsp.status(400).json({ error: 'missing name' });
@@ -72,10 +63,10 @@ app.post('/api/persons', (req, rsp) => {
         number: body.number,
     }).save().then(person => {
         rsp.json(person);
-    }).catch(handleError(rsp));
+    }).catch(next);
 });
 
-app.patch('/api/persons/:id', (req, rsp) => {
+app.patch('/api/persons/:id', (req, rsp, next) => {
     const newName = req.body.name;
     if (typeof newName === 'string') {
         if (newName.length === 0) {
@@ -103,10 +94,18 @@ app.patch('/api/persons/:id', (req, rsp) => {
         return person.save().then(person => {
             rsp.json(person);
         });
-    }).catch(handleError(rsp));
+    }).catch(next);
 
     // TODO: check for unique name...
     // return rsp.status(400).json({ error: 'name must be unique' });
+});
+
+app.use((error, req, rsp, next) => {
+    console.error(error.message ?? error);
+    if (error.name === 'CastError') {
+        return rsp.status(400).send({ error: 'malformatted id' })
+    }
+    return rsp.status(500).send({ error: error.message ?? error });
 });
 
 const PORT = process.env.PORT || 3001;
